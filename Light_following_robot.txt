@@ -1,0 +1,124 @@
+
+// Motor control pins
+int M1 = 5; // Enable pin for right motor
+int M2 = 4; // Speed control pin for left motor
+int M3 = 6; // Enable pin for the left motor
+int M4 = 7; // Speed control pin for right motor
+int E1 = 9;
+int E2 = 10;
+int leftMotorSpeed = 100;
+int rightMotorSpeed = 100;
+// The following motor speeds are determined by experiment
+// so that the robot moves forward in a straight line.
+int sensorPinRight = A5; // Right sensor pin
+int sensorPinCenter = A4; // Center sensor pin
+int sensorPinLeft = A3; // Left sensor pin
+int potCenter = A1;
+int potLeft = A0;
+int potRight = A2;
+
+int lightReadingRight;
+int lightToleranceRight; // Sensor reading needed to trigger right turn
+
+int lightReadingCenter;
+int lightToleranceCenter; // Sensor reading needed to trigger forward movement
+
+int lightReadingLeft;
+int lightToleranceLeft; // Sensor reading needed to trigger left turn
+
+int readingDelay = 100; // Delay between readings
+
+void setup()
+{
+  pinMode(M1, OUTPUT);
+  pinMode(M2, OUTPUT);
+  pinMode(M3, OUTPUT);
+  pinMode(M4, OUTPUT);
+  pinMode(E1, OUTPUT);
+  pinMode(E2, OUTPUT);
+  // Uncomment the serial feed for calibration purposes
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  // Uncomment the serial print lines for calibration purposes
+
+  // Take reading from right sensor
+  lightReadingRight = analogRead(sensorPinRight);
+  lightToleranceRight = analogRead(potRight);
+  Serial.print("Right Sensor Reading :");
+  Serial.println(lightReadingRight);
+  
+
+  // Take reading from center sensor
+  lightReadingCenter = analogRead(sensorPinCenter);
+  lightToleranceCenter = analogRead(potCenter);
+  Serial.print("Center Sensor Reading :");
+  Serial.println(lightReadingCenter);
+  
+  // Take reading from left sensor
+  lightReadingLeft = analogRead(sensorPinLeft);
+  lightToleranceLeft = analogRead(potLeft);
+  Serial.print("Left Sensor Reading :");
+  Serial.println(lightReadingLeft);
+  
+
+  // Move forward if enought light is detected from center sensor
+  if (lightReadingCenter > lightToleranceCenter)
+  {
+    digitalWrite(M1, LOW);
+    digitalWrite(M2, HIGH);
+    digitalWrite(M3, LOW);
+    digitalWrite(M4, HIGH);
+    analogWrite(E1, leftMotorSpeed);
+    analogWrite(E2, rightMotorSpeed);
+    delay(readingDelay);
+    // Stop
+    digitalWrite(M1, LOW);
+    digitalWrite(M2, LOW);
+    digitalWrite(M3, LOW);
+    digitalWrite(M4, LOW);
+    analogWrite(E1, 0);
+    analogWrite(E2, 0);
+  }
+
+  // Turn right if enough light is detected from right sensor
+  if (lightReadingRight > lightToleranceRight)
+  {
+    digitalWrite(M1, HIGH);
+    digitalWrite(M2, LOW);
+    digitalWrite(M3, LOW);
+    digitalWrite(M4, HIGH);
+    analogWrite(E1, leftMotorSpeed);
+    analogWrite(E2, rightMotorSpeed);
+    delay(readingDelay);
+    // Stop
+    digitalWrite(M1, LOW);
+    digitalWrite(M2, LOW);
+    digitalWrite(M3, LOW);
+    digitalWrite(M4, LOW);
+    analogWrite(E1, 0);
+    analogWrite(E2, 0);
+  }
+
+  // Turn left if enough light is detected from left sensor
+  if (lightReadingLeft > lightToleranceLeft)
+  {
+    digitalWrite(M1, LOW);
+    digitalWrite(M2, HIGH);
+    digitalWrite(M3, HIGH);
+    digitalWrite(M4, LOW);
+    analogWrite(E1, leftMotorSpeed);
+    analogWrite(E2, rightMotorSpeed);
+    delay(readingDelay);
+    // Stop
+    digitalWrite(M1, LOW);
+    digitalWrite(M2, LOW);
+    digitalWrite(M3, LOW);
+    digitalWrite(M4, LOW);
+    analogWrite(E1, 0);
+    analogWrite(E2, 0);
+  }
+
+}
